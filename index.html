@@ -1,0 +1,56 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Telegram Mini App</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <div class="top-bar">
+      <img id="avatar" src="" class="avatar" />
+    </div>
+
+    <div id="profile" class="profile hidden">
+      <img id="profile-avatar" class="profile-avatar" />
+      <div class="username">@<span id="username"></span></div>
+      <div class="user-id">ID: <span id="user-id"></span></div>
+      <div class="buttons">
+        <button id="sales-btn">Продажи</button>
+        <button id="purchases-btn">Покупки</button>
+      </div>
+      <div id="history"></div>
+    </div>
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    window.Telegram.WebApp.ready();
+    const tg = window.Telegram.WebApp;
+
+    const avatar = document.getElementById("avatar");
+    const profile = document.getElementById("profile");
+    const profileAvatar = document.getElementById("profile-avatar");
+    const usernameEl = document.getElementById("username");
+    const userIdEl = document.getElementById("user-id");
+    const historyDiv = document.getElementById("history");
+
+    const user = tg.initDataUnsafe.user;
+    if (user) {
+      const username = user.username || "anonymous";
+      const userId = user.id;
+      const avatarUrl = `https://t.me/i/userpic/160/${username}.jpg`;
+
+      avatar.src = avatarUrl;
+      profileAvatar.src = avatarUrl;
+      usernameEl.innerText = username;
+      userIdEl.innerText = userId;
+    }
+
+    avatar.addEventListener("click", () => {
+      profile.classList.toggle("hidden");
+    });
+
+    document.getEle
