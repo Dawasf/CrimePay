@@ -6,7 +6,48 @@
   <title>Telegram Mini App</title>
   <style>
     .hidden { display: none; }
-    .avatar, .profile-avatar { width: 64px; height: 64px; border-radius: 50%; }
+    .avatar, .profile-avatar { 
+      width: 64px; 
+      height: 64px; 
+      border-radius: 50%; 
+      cursor: pointer;
+    }
+    .profile-window {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .profile-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      max-width: 300px;
+      width: 100%;
+    }
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    .username, .user-id {
+      font-size: 18px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -27,14 +68,25 @@
     </div>
   </div>
 
+  <!-- Окно профиля -->
+  <div id="profile-window" class="profile-window hidden">
+    <button class="close-btn" id="close-profile">×</button>
+    <div class="profile-content">
+      <img id="window-avatar" class="profile-avatar" />
+      <div class="username">@<span id="window-username"></span></div>
+      <div class="user-id">ID: <span id="window-user-id"></span></div>
+    </div>
+  </div>
+
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
     const tg = window.Telegram.WebApp;
     const avatar = document.getElementById("avatar");
-    const profile = document.getElementById("profile");
-    const profileAvatar = document.getElementById("profile-avatar");
-    const usernameEl = document.getElementById("username");
-    const userIdEl = document.getElementById("user-id");
+    const profileWindow = document.getElementById("profile-window");
+    const closeProfileBtn = document.getElementById("close-profile");
+    const windowAvatar = document.getElementById("window-avatar");
+    const windowUsername = document.getElementById("window-username");
+    const windowUserId = document.getElementById("window-user-id");
 
     tg.ready();
     let user = tg.initDataUnsafe?.user;
@@ -46,9 +98,9 @@
       const avatarUrl = `https://t.me/i/userpic/160/${username}.jpg`;
 
       avatar.src = avatarUrl;
-      profileAvatar.src = avatarUrl;
-      usernameEl.innerText = username;
-      userIdEl.innerText = userId;
+      windowAvatar.src = avatarUrl;
+      windowUsername.innerText = username;
+      windowUserId.innerText = userId;
     } else {
       // Попытка получить chat_id из URL
       const urlParams = new URLSearchParams(window.location.search);
@@ -63,22 +115,26 @@
             const avatarUrl = `https://t.me/i/userpic/160/${username}.jpg`;
 
             avatar.src = avatarUrl;
-            profileAvatar.src = avatarUrl;
-            usernameEl.innerText = username;
-            userIdEl.innerText = userId;
+            windowAvatar.src = avatarUrl;
+            windowUsername.innerText = username;
+            windowUserId.innerText = userId;
           })
           .catch(err => {
-            usernameEl.innerText = "ошибка";
-            userIdEl.innerText = "нет данных";
+            windowUsername.innerText = "ошибка";
+            windowUserId.innerText = "нет данных";
           });
       } else {
-        usernameEl.innerText = "не передан";
-        userIdEl.innerText = "не передан";
+        windowUsername.innerText = "не передан";
+        windowUserId.innerText = "не передан";
       }
     }
 
     avatar.addEventListener("click", () => {
-      profile.classList.toggle("hidden");
+      profileWindow.classList.remove("hidden");
+    });
+
+    closeProfileBtn.addEventListener("click", () => {
+      profileWindow.classList.add("hidden");
     });
   </script>
 </body>
