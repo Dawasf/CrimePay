@@ -1,11 +1,13 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Telegram Mini App</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    .hidden { display: none; }
+    .avatar, .profile-avatar { width: 64px; height: 64px; border-radius: 50%; }
+  </style>
 </head>
 <body>
   <div id="app">
@@ -27,19 +29,19 @@
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
-    window.Telegram.WebApp.ready();
     const tg = window.Telegram.WebApp;
-
     const avatar = document.getElementById("avatar");
     const profile = document.getElementById("profile");
     const profileAvatar = document.getElementById("profile-avatar");
     const usernameEl = document.getElementById("username");
     const userIdEl = document.getElementById("user-id");
-    const historyDiv = document.getElementById("history");
 
-    const user = tg.initDataUnsafe.user;
-    if (user) {
-      const username = user.username || "anonymous";
+    tg.ready();
+    let user = tg.initDataUnsafe?.user;
+
+    if (user && user.id) {
+      // Если данные пришли из Telegram WebApp
+      const username = user.username || "без_имени";
       const userId = user.id;
       const avatarUrl = `https://t.me/i/userpic/160/${username}.jpg`;
 
@@ -47,10 +49,37 @@
       profileAvatar.src = avatarUrl;
       usernameEl.innerText = username;
       userIdEl.innerText = userId;
+    } else {
+      // Попытка получить chat_id из URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const chatId = urlParams.get("chat_id");
+
+      if (chatId) {
+        fetch(`https://YOUR-BACKEND-DOMAIN/api/user_info?chat_id=${chatId}`)
+          .then(res => res.json())
+          .then(data => {
+            const username = data.username || "без_имени";
+            const userId = data.id;
+            const avatarUrl = `https://t.me/i/userpic/160/${username}.jpg`;
+
+            avatar.src = avatarUrl;
+            profileAvatar.src = avatarUrl;
+            usernameEl.innerText = username;
+            userIdEl.innerText = userId;
+          })
+          .catch(err => {
+            usernameEl.innerText = "ошибка";
+            userIdEl.innerText = "нет данных";
+          });
+      } else {
+        usernameEl.innerText = "не передан";
+        userIdEl.innerText = "не передан";
+      }
     }
 
     avatar.addEventListener("click", () => {
       profile.classList.toggle("hidden");
     });
-
-    document.getEle
+  </script>
+</body>
+</html>
