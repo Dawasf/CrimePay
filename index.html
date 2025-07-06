@@ -1,131 +1,121 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Профиль</title>
   <style>
     body {
       margin: 0;
       padding: 20px;
+      background-color: #2a2a2a;
+      color: #ffffff;
       font-family: Arial, sans-serif;
+      min-height: 100vh;
+    }
+    .back-btn {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      background: #444;
+      color: white;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
       display: flex;
-      flex-direction: column;
       align-items: center;
+      justify-content: center;
+    }
+    .profile-container {
+      max-width: 400px;
+      margin: 0 auto;
+      padding-top: 30px;
+      text-align: center;
     }
     .profile-avatar {
-      width: 100px;
-      height: 100px;
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
-      margin: 20px 0;
+      border: 3px solid #444;
+      margin-bottom: 20px;
     }
     .username {
-      font-size: 20px;
+      font-size: 24px;
       font-weight: bold;
-      margin: 10px 0;
+      margin-bottom: 5px;
     }
     .user-id {
-      color: #666;
+      color: #aaa;
       margin-bottom: 30px;
     }
     .buttons {
       display: flex;
+      justify-content: center;
       gap: 15px;
-      margin-bottom: 30px;
+      margin-bottom: 40px;
     }
-    button {
-      padding: 10px 20px;
-      background-color: #0088cc;
+    .btn {
+      padding: 12px 25px;
+      background-color: #444;
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 16px;
+      transition: background-color 0.3s;
     }
-    button:hover {
-      background-color: #0077bb;
-    }
-    .back-btn {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
+    .btn:hover {
+      background-color: #555;
     }
   </style>
 </head>
 <body>
-  <button class="back-btn" id="back-btn">←</button>
+  <button class="back-btn" onclick="window.history.back()">←</button>
   
-  <img id="profile-avatar" class="profile-avatar" />
-  <div class="username">@<span id="username"></span></div>
-  <div class="user-id">ID: <span id="user-id"></span></div>
-  
-  <div class="buttons">
-    <button id="sales-btn">Продажи</button>
-    <button id="purchases-btn">Покупки</button>
+  <div class="profile-container">
+    <img id="profile-avatar" class="profile-avatar" src="">
+    <div class="username">@<span id="username">username</span></div>
+    <div class="user-id">ID: <span id="user-id">12345</span></div>
+    
+    <div class="buttons">
+      <button class="btn" id="sales-btn">Продажи</button>
+      <button class="btn" id="purchases-btn">Покупки</button>
+    </div>
   </div>
-
-  <div id="history"></div>
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
     const tg = window.Telegram.WebApp;
-    const backBtn = document.getElementById("back-btn");
-    const profileAvatar = document.getElementById("profile-avatar");
-    const usernameEl = document.getElementById("username");
-    const userIdEl = document.getElementById("user-id");
+    const profileAvatar = document.getElementById('profile-avatar');
+    const usernameEl = document.getElementById('username');
+    const userIdEl = document.getElementById('user-id');
 
     tg.ready();
     let user = tg.initDataUnsafe?.user;
 
     if (user && user.id) {
-      const username = user.username || "без_имени";
+      const username = user.username || "user";
       const userId = user.id;
-      const avatarUrl = `https://t.me/i/userpic/160/${username}.jpg`;
-
-      profileAvatar.src = avatarUrl;
-      usernameEl.innerText = username;
-      userIdEl.innerText = userId;
+      profileAvatar.src = `https://t.me/i/userpic/160/${username}.jpg`;
+      usernameEl.textContent = username;
+      userIdEl.textContent = userId;
     } else {
-      const urlParams = new URLSearchParams(window.location.search);
-      const chatId = urlParams.get("chat_id");
-      
-      if (chatId) {
-        fetch(`https://YOUR-BACKEND-DOMAIN/api/user_info?chat_id=${chatId}`)
-          .then(res => res.json())
-          .then(data => {
-            const username = data.username || "без_имени";
-            const userId = data.id;
-            const avatarUrl = `https://t.me/i/userpic/160/${username}.jpg`;
-
-            profileAvatar.src = avatarUrl;
-            usernameEl.innerText = username;
-            userIdEl.innerText = userId;
-          })
-          .catch(err => {
-            usernameEl.innerText = "ошибка";
-            userIdEl.innerText = "нет данных";
-          });
-      } else {
-        usernameEl.innerText = "не передан";
-        userIdEl.innerText = "не передан";
-      }
+      // Заглушка, если данные не пришли
+      profileAvatar.src = "https://via.placeholder.com/120";
+      usernameEl.textContent = "user";
+      userIdEl.textContent = "00000";
     }
 
-    backBtn.addEventListener("click", () => {
-      window.history.back(); // Возврат на предыдущую страницу
+    // Обработчики для кнопок
+    document.getElementById('sales-btn').addEventListener('click', () => {
+      alert('Раздел "Продажи"');
     });
-
-    // Здесь можно добавить обработчики для кнопок "Продажи" и "Покупки"
-    document.getElementById("sales-btn").addEventListener("click", () => {
-      // Логика для продаж
-    });
-
-    document.getElementById("purchases-btn").addEventListener("click", () => {
-      // Логика для покупок
+    
+    document.getElementById('purchases-btn').addEventListener('click', () => {
+      alert('Раздел "Покупки"');
     });
   </script>
 </body>
