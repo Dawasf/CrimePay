@@ -3,109 +3,96 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Telegram Mini App</title>
+  <title>Профиль</title>
   <style>
-    .hidden { display: none; }
-    .avatar, .profile-avatar { 
-      width: 64px; 
-      height: 64px; 
-      border-radius: 50%; 
-      cursor: pointer;
-    }
-    .profile-window {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
+    body {
+      margin: 0;
       padding: 20px;
-      box-sizing: border-box;
-    }
-    .profile-content {
+      font-family: Arial, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 15px;
-      max-width: 300px;
-      width: 100%;
     }
-    .close-btn {
+    .profile-avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin: 20px 0;
+    }
+    .username {
+      font-size: 20px;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+    .user-id {
+      color: #666;
+      margin-bottom: 30px;
+    }
+    .buttons {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #0088cc;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #0077bb;
+    }
+    .back-btn {
       position: absolute;
-      top: 20px;
-      right: 20px;
+      top: 10px;
+      left: 10px;
       background: none;
       border: none;
       font-size: 24px;
       cursor: pointer;
     }
-    .username, .user-id {
-      font-size: 18px;
-      text-align: center;
-    }
   </style>
 </head>
 <body>
-  <div id="app">
-    <div class="top-bar">
-      <img id="avatar" src="" class="avatar" />
-    </div>
-
-    <div id="profile" class="profile hidden">
-      <img id="profile-avatar" class="profile-avatar" />
-      <div class="username">@<span id="username"></span></div>
-      <div class="user-id">ID: <span id="user-id"></span></div>
-      <div class="buttons">
-        <button id="sales-btn">Продажи</button>
-        <button id="purchases-btn">Покупки</button>
-      </div>
-      <div id="history"></div>
-    </div>
+  <button class="back-btn" id="back-btn">←</button>
+  
+  <img id="profile-avatar" class="profile-avatar" />
+  <div class="username">@<span id="username"></span></div>
+  <div class="user-id">ID: <span id="user-id"></span></div>
+  
+  <div class="buttons">
+    <button id="sales-btn">Продажи</button>
+    <button id="purchases-btn">Покупки</button>
   </div>
 
-  <!-- Окно профиля -->
-  <div id="profile-window" class="profile-window hidden">
-    <button class="close-btn" id="close-profile">×</button>
-    <div class="profile-content">
-      <img id="window-avatar" class="profile-avatar" />
-      <div class="username">@<span id="window-username"></span></div>
-      <div class="user-id">ID: <span id="window-user-id"></span></div>
-    </div>
-  </div>
+  <div id="history"></div>
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
     const tg = window.Telegram.WebApp;
-    const avatar = document.getElementById("avatar");
-    const profileWindow = document.getElementById("profile-window");
-    const closeProfileBtn = document.getElementById("close-profile");
-    const windowAvatar = document.getElementById("window-avatar");
-    const windowUsername = document.getElementById("window-username");
-    const windowUserId = document.getElementById("window-user-id");
+    const backBtn = document.getElementById("back-btn");
+    const profileAvatar = document.getElementById("profile-avatar");
+    const usernameEl = document.getElementById("username");
+    const userIdEl = document.getElementById("user-id");
 
     tg.ready();
     let user = tg.initDataUnsafe?.user;
 
     if (user && user.id) {
-      // Если данные пришли из Telegram WebApp
       const username = user.username || "без_имени";
       const userId = user.id;
       const avatarUrl = `https://t.me/i/userpic/160/${username}.jpg`;
 
-      avatar.src = avatarUrl;
-      windowAvatar.src = avatarUrl;
-      windowUsername.innerText = username;
-      windowUserId.innerText = userId;
+      profileAvatar.src = avatarUrl;
+      usernameEl.innerText = username;
+      userIdEl.innerText = userId;
     } else {
-      // Попытка получить chat_id из URL
       const urlParams = new URLSearchParams(window.location.search);
       const chatId = urlParams.get("chat_id");
-
+      
       if (chatId) {
         fetch(`https://YOUR-BACKEND-DOMAIN/api/user_info?chat_id=${chatId}`)
           .then(res => res.json())
@@ -114,27 +101,31 @@
             const userId = data.id;
             const avatarUrl = `https://t.me/i/userpic/160/${username}.jpg`;
 
-            avatar.src = avatarUrl;
-            windowAvatar.src = avatarUrl;
-            windowUsername.innerText = username;
-            windowUserId.innerText = userId;
+            profileAvatar.src = avatarUrl;
+            usernameEl.innerText = username;
+            userIdEl.innerText = userId;
           })
           .catch(err => {
-            windowUsername.innerText = "ошибка";
-            windowUserId.innerText = "нет данных";
+            usernameEl.innerText = "ошибка";
+            userIdEl.innerText = "нет данных";
           });
       } else {
-        windowUsername.innerText = "не передан";
-        windowUserId.innerText = "не передан";
+        usernameEl.innerText = "не передан";
+        userIdEl.innerText = "не передан";
       }
     }
 
-    avatar.addEventListener("click", () => {
-      profileWindow.classList.remove("hidden");
+    backBtn.addEventListener("click", () => {
+      window.history.back(); // Возврат на предыдущую страницу
     });
 
-    closeProfileBtn.addEventListener("click", () => {
-      profileWindow.classList.add("hidden");
+    // Здесь можно добавить обработчики для кнопок "Продажи" и "Покупки"
+    document.getElementById("sales-btn").addEventListener("click", () => {
+      // Логика для продаж
+    });
+
+    document.getElementById("purchases-btn").addEventListener("click", () => {
+      // Логика для покупок
     });
   </script>
 </body>
