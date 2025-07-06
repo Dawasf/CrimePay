@@ -28,6 +28,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      z-index: 10;
     }
     .profile-container {
       max-width: 400px;
@@ -41,11 +42,13 @@
       border-radius: 50%;
       border: 3px solid #444;
       margin-bottom: 20px;
+      object-fit: cover;
     }
     .username {
       font-size: 24px;
       font-weight: bold;
       margin-bottom: 5px;
+      color: #f0f0f0;
     }
     .user-id {
       color: #aaa;
@@ -56,6 +59,7 @@
       justify-content: center;
       gap: 15px;
       margin-bottom: 40px;
+      flex-wrap: wrap;
     }
     .btn {
       padding: 12px 25px;
@@ -66,6 +70,7 @@
       cursor: pointer;
       font-size: 16px;
       transition: background-color 0.3s;
+      min-width: 120px;
     }
     .btn:hover {
       background-color: #555;
@@ -73,10 +78,10 @@
   </style>
 </head>
 <body>
-  <button class="back-btn" onclick="window.history.back()">←</button>
+  <button class="back-btn" id="back-btn">←</button>
   
   <div class="profile-container">
-    <img id="profile-avatar" class="profile-avatar" src="">
+    <img id="profile-avatar" class="profile-avatar" src="https://via.placeholder.com/120">
     <div class="username">@<span id="username">username</span></div>
     <div class="user-id">ID: <span id="user-id">12345</span></div>
     
@@ -92,7 +97,9 @@
     const profileAvatar = document.getElementById('profile-avatar');
     const usernameEl = document.getElementById('username');
     const userIdEl = document.getElementById('user-id');
+    const backBtn = document.getElementById('back-btn');
 
+    // Получаем данные пользователя
     tg.ready();
     let user = tg.initDataUnsafe?.user;
 
@@ -102,20 +109,20 @@
       profileAvatar.src = `https://t.me/i/userpic/160/${username}.jpg`;
       usernameEl.textContent = username;
       userIdEl.textContent = userId;
-    } else {
-      // Заглушка, если данные не пришли
-      profileAvatar.src = "https://via.placeholder.com/120";
-      usernameEl.textContent = "user";
-      userIdEl.textContent = "00000";
     }
 
-    // Обработчики для кнопок
+    // Кнопка назад - всегда ведет на главную
+    backBtn.addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
+
+    // Обработчики кнопок
     document.getElementById('sales-btn').addEventListener('click', () => {
-      alert('Раздел "Продажи"');
+      alert('Раздел "Продажи" в разработке');
     });
     
     document.getElementById('purchases-btn').addEventListener('click', () => {
-      alert('Раздел "Покупки"');
+      alert('Раздел "Покупки" в разработке');
     });
   </script>
 </body>
